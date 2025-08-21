@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="en">  
 <head>  
   <meta charset="utf-8" />  
@@ -21,18 +20,20 @@
     <div style="position:relative;">  
       <video id="video" autoplay muted playsinline></video>  
       <canvas id="overlay" width="480" height="360" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>  
-    </div>  <div id="controls">  
-  <button id="startBtn">Start (Camera & Music)</button>  
-  <button id="stopBtn" disabled>Stop</button>  
-  <div id="status">Not ready</div>  
-</div>  
+    </div>  
+    <div id="controls">  
+      <button id="startBtn">Start (Camera & Music)</button>  
+      <button id="stopBtn" disabled>Stop</button>  
+      <div id="status">Not ready</div>  
+    </div>  
 
-<div class="song-info">  
-  <div>Current Emotion: <span id="currentEmotion">—</span></div>  
-  <div>Current Song: <span id="currentSong">—</span></div>  
-</div>
+    <div class="song-info">  
+      <div>Current Emotion: <span id="currentEmotion">—</span></div>  
+      <div>Current Song: <span id="currentSong">—</span></div>  
+    </div>
+  </div>    
 
-  </div>    <div id="right">  
+  <div id="right">  
     <h3>Instructions</h3>  
     <p>This app detects your face, recognizes emotion, and plays the matching song.</p>  
     <ul>  
@@ -42,15 +43,20 @@
       <li><code>surprised.mp3</code></li>  
       <li><code>neutral.mp3</code></li>  
     </ul>  
-    <p>Place these mp3 files in the same folder.    
-       Models should be in <code>/models</code> folder (face-api.js pretrained models).</p>  
-  </div>    <!-- audio elements -->  <audio id="audio-happy" src="happy.mp3" preload="auto"></audio>
-<audio id="audio-sad" src="sad.mp3" preload="auto"></audio>
-<audio id="audio-angry" src="angry.mp3" preload="auto"></audio>
-<audio id="audio-surprised" src="surprised.mp3" preload="auto"></audio>
-<audio id="audio-neutral" src="neutral.mp3" preload="auto"></audio>
+    <p>Place these mp3 files in the same folder. Models should be in <code>/models</code> folder (face-api.js pretrained models).</p>  
+    <p><strong>Note:</strong> When you click "Start", your browser will ask for camera access. Please grant permission.</p>
+  </div>    
 
-  <!-- face-api.js -->    <script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>    <script>  
+  <!-- audio elements -->  
+  <audio id="audio-happy" src="happy.mp3" preload="auto"></audio>
+  <audio id="audio-sad" src="sad.mp3" preload="auto"></audio>
+  <audio id="audio-angry" src="angry.mp3" preload="auto"></audio>
+  <audio id="audio-surprised" src="surprised.mp3" preload="auto"></audio>
+  <audio id="audio-neutral" src="neutral.mp3" preload="auto"></audio>
+
+  <!-- face-api.js -->  
+  <script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>  
+  <script>  
     const video = document.getElementById('video');  
     const overlay = document.getElementById('overlay');  
     const ctx = overlay.getContext('2d');  
@@ -172,7 +178,7 @@
             ctx.fillRect(box.x, box.y - 24, 220, 22);  
             ctx.fillStyle = '#fff';  
             ctx.font = '14px sans-serif';  
-            ctx.fillText(Detected: ${best} (${(bestScore*100).toFixed(0)}%), box.x + 4, box.y - 6);  
+            ctx.fillText(`Detected: ${best} (${(bestScore*100).toFixed(0)}%)`, box.x + 4, box.y - 6);  
           }  
         } else {  
           history.length = 0;  
@@ -209,5 +215,6 @@
     startBtn.addEventListener('click', async () => { await startDetection(); });  
     stopBtn.addEventListener('click', () => { stopDetection(); });  
     window.addEventListener('beforeunload', () => stopDetection());  
-  </script>  </body>  
+  </script>  
+</body>  
 </html>

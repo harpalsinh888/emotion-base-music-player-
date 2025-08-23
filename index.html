@@ -1,221 +1,52 @@
-<!doctype html>
-<html lang="en">  
-<head>  
-  <meta charset="utf-8" />  
-  <meta name="viewport" content="width=device-width,initial-scale=1" />  
-  <title>Emotion-based Music Player</title>  
-  <style>  
-    body { font-family: sans-serif; display:flex; gap:20px; padding:20px; align-items:flex-start; }  
-    #left { display:flex; flex-direction:column; gap:10px; }  
-    video { border-radius:8px; width:480px; height:360px; background:#000; }  
-    canvas { position:absolute; left:0; top:0; }  
-    #controls { display:flex; gap:8px; align-items:center; }  
-    #status { margin-top:6px; font-weight:600; }  
-    .song-info { margin-top:10px; }  
-    button { padding:8px 12px; border-radius:6px; cursor:pointer; }  
-  </style>  
-</head>  
-<body>  
- <audio id="audio-happy" src="happy.mp3" preload="auto"></audio>
-  <div id="left">  
-    <div style="position:relative;">  
-      <video id="video" autoplay muted playsinline></video>  
-      <canvas id="overlay" width="480" height="360" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>  
-    </div>  
-    <div id="controls">  
-      <button id="startBtn">Start (Camera & Music)</button>  
-      <button id="stopBtn" disabled>Stop</button>  
-      <div id="status">Not ready</div>  
-    </div>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emoji Music Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f9;
+      padding: 40px;
+    }
+    h1 {
+      color: #333;
+    }
+    .emoji {
+      font-size: 50px;
+      margin: 20px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .emoji:hover {
+      transform: scale(1.3);
+    }
+  </style>
+</head>
+<body>
+  <h1>🎵 Click Emoji to Play Song 🎵</h1>
+  
+  <!-- Emojis -->
+  <div>
+    <span class="emoji" onclick="playSong('happy')">😊</span>
+    <span class="emoji" onclick="playSong('sad')">😢</span>
+    <span class="emoji" onclick="playSong('angry')">😡</span>
+    <span class="emoji" onclick="playSong('love')">😍</span>
+  </div>
 
-    <div class="song-info">  
-      <div>Current Emotion: <span id="currentEmotion">—</span></div>  
-      <div>Current Song: <span id="currentSong">—</span></div>  
-    </div>
-  </div>    
+  <!-- Audio -->
+  <audio id="audioPlayer" controls style="margin-top:20px; width:80%;"></audio>
 
-  <div id="right">  
-    <h3>Instructions</h3>  
-    <p>This app detects your face, recognizes emotion, and plays the matching song.</p>  
-    <ul>  
-      <li><code>happy.mp3</code></li>  
-      <li><code>sad.mp3</code></li>  
-      <li><code>angry.mp3</code></li>  
-      <li><code>surprised.mp3</code></li>  
-      <li><code>neutral.mp3</code></li>  
-    </ul>  
-    <p>Place these mp3 files in the same folder. Models should be in <code>/models</code> folder (face-api.js pretrained models).</p>  
-    <p><strong>Note:</strong> When you click "Start", your browser will ask for camera access. Please grant permission.</p>
-  </div>    
-
-  <!-- audio elements -->  
-  <audio id="audio-happy" src="happy.mp3" preload="auto"></audio>
-  <audio id="audio-sad" src="sad.mp3" preload="auto"></audio>
-  <audio id="audio-angry" src="angry.mp3" preload="auto"></audio>
-  <audio id="audio-surprised" src="surprised.mp3" preload="auto"></audio>
-  <audio id="audio-neutral" src="neutral.mp3" preload="auto"></audio>
-
-  <!-- face-api.js -->  
-  <script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>  
-  <script>  
-    const video = document.getElementById('video');  
-    const overlay = document.getElementById('overlay');  
-    const ctx = overlay.getContext('2d');  
-    const startBtn = document.getElementById('startBtn');  
-    const stopBtn = document.getElementById('stopBtn');  
-    const statusEl = document.getElementById('status');  
-    const currentEmotionEl = document.getElementById('currentEmotion');  
-    const currentSongEl = document.getElementById('currentSong');  
-  
-    const audios = {  
-      happy: document.getElementById('audio-happy'),  
-      sad: document.getElementById('audio-sad'),  
-      angry: document.getElementById('audio-angry'),  
-      surprised: document.getElementById('audio-surprised'),  
-      neutral: document.getElementById('audio-neutral')  
-    };  
-  
-    const expressionMap = {  
-      happy: 'happy',  
-      sad: 'sad',  
-      angry: 'angry',  
-      surprised: 'surprised',  
-      neutral: 'neutral',  
-      disgusted: 'angry',  
-      fearful: 'surprised'  
-    };  
-  
-    let stream = null;  
-    let detectionInterval = null;  
-    let running = false;  
-    const history = [];  
-    const HISTORY_SIZE = 7;  
-  
-    async function loadModels() {  
-      statusEl.innerText = 'Loading models...';  
-      const MODEL_URL = './models';  
-      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);  
-      await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);  
-      statusEl.innerText = 'Models ready.';  
-    }  
-  
-    function majorityEmotion() {  
-      if (history.length === 0) return null;  
-      const counts = {};  
-      history.forEach(e => counts[e] = (counts[e] || 0) + 1);  
-      let max = null, maxCount = 0;  
-      for (const k in counts) {  
-        if (counts[k] > maxCount) { max = k; maxCount = counts[k]; }  
-      }  
-      return max;  
-    }  
-  
-    function stopAllAudios() {  
-      for (const k in audios) {  
-        try { audios[k].pause(); audios[k].currentTime = 0; } catch(e){}  
-      }  
-    }  
-  
-    function playForEmotion(emotion) {  
-      if (!emotion) return;  
-      const key = expressionMap[emotion] || 'neutral';  
-      currentEmotionEl.innerText = key;  
-      currentSongEl.innerText = (audios[key] && audios[key].src) ? audios[key].src.split('/').pop() : 'none';  
-      stopAllAudios();  
-      const a = audios[key];  
-      if (a) {  
-        a.play().catch(err => console.warn('Play failed:', err));  
-      }  
-    }  
-  
-    async function startDetection() {  
-      if (running) return;  
-      running = true;  
-      startBtn.disabled = true;  
-      stopBtn.disabled = false;  
-  
-      try {  
-        stream = await navigator.mediaDevices.getUserMedia({ video: { width: 480, height: 360 }, audio: false });  
-        video.srcObject = stream;  
-      } catch (err) {  
-        alert('Camera access failed: ' + err.message);  
-        running = false;  
-        startBtn.disabled = false;  
-        stopBtn.disabled = true;  
-        return;  
-      }  
-  
-      await new Promise(res => video.onloadedmetadata = res);  
-      overlay.width = video.videoWidth || 480;  
-      overlay.height = video.videoHeight || 360;  
-  
-      const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 256, scoreThreshold: 0.5 });  
-      statusEl.innerText = 'Detecting...';  
-  
-      detectionInterval = setInterval(async () => {  
-        if (video.paused || video.ended) return;  
-        const detections = await faceapi.detectSingleFace(video, options).withFaceExpressions();  
-        ctx.clearRect(0,0,overlay.width, overlay.height);  
-  
-        if (detections) {  
-          const { expressions, detection } = detections;  
-          const box = detection.box;  
-          ctx.strokeStyle = '#00ff00';  
-          ctx.lineWidth = 2;  
-          ctx.strokeRect(box.x, box.y, box.width, box.height);  
-  
-          let best = null, bestScore = 0;  
-          for (const [exp, score] of Object.entries(expressions)) {  
-            if (score > bestScore) { best = exp; bestScore = score; }  
-          }  
-  
-          if (best) {  
-            history.push(best);  
-            if (history.length > HISTORY_SIZE) history.shift();  
-            const majority = majorityEmotion();  
-            playForEmotion(majority);  
-  
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';  
-            ctx.fillRect(box.x, box.y - 24, 220, 22);  
-            ctx.fillStyle = '#fff';  
-            ctx.font = '14px sans-serif';  
-            ctx.fillText(`Detected: ${best} (${(bestScore*100).toFixed(0)}%)`, box.x + 4, box.y - 6);  
-          }  
-        } else {  
-          history.length = 0;  
-          currentEmotionEl.innerText = '—';  
-          currentSongEl.innerText = '—';  
-        }  
-      }, 400);  
-    }  
-  
-    function stopDetection() {  
-      if (!running) return;  
-      running = false;  
-      startBtn.disabled = false;  
-      stopBtn.disabled = true;  
-      statusEl.innerText = 'Stopped';  
-      clearInterval(detectionInterval);  
-      detectionInterval = null;  
-      history.length = 0;  
-      currentEmotionEl.innerText = '—';  
-      currentSongEl.innerText = '—';  
-      stopAllAudios();  
-      if (stream) {  
-        stream.getTracks().forEach(t => t.stop());  
-        stream = null;  
-        video.srcObject = null;  
-      }  
-    }  
-  
-    loadModels().catch(err => {  
-      console.error('Model load error', err);  
-      statusEl.innerText = 'Error loading models (check console)';  
-    });  
-  
-    startBtn.addEventListener('click', async () => { await startDetection(); });  
-    stopBtn.addEventListener('click', () => { stopDetection(); });  
-    window.addEventListener('beforeunload', () => stopDetection());  
-  </script>  
-</body>  
+  <script>
+    function playSong(mood) {
+      const audio = document.getElementById("audioPlayer");
+      audio.src = `music/${mood}.mp3`; // 👈 Path check karo
+      audio.play().catch(err => {
+        alert("Audio play error: " + err);
+      });
+    }
+  </script>
+</body>
 </html>

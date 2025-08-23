@@ -25,7 +25,7 @@
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       text-align: center;
-      width: 300px;
+      width: 320px;
     }
     button {
       background: #ffcc00;
@@ -45,34 +45,58 @@
       width: 100%;
       border-radius: 10px;
     }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 15px;
+      text-align: left;
+    }
+    li {
+      padding: 5px;
+      cursor: pointer;
+    }
+    li:hover {
+      color: #ffcc00;
+    }
   </style>
 </head>
 <body>
   <h1>🎶 Emotion Songs Player 🎶</h1>
   <div class="player-box">
-    <h2>Happy Songs</h2>
-    <button onclick="playSongs()">▶ Play Playlist</button>
+    <h2>Playlist</h2>
+    <button onclick="playSongs()">▶ Play All</button>
     <audio id="player" controls></audio>
+    <ul id="playlist">
+      <li onclick="playSingle(0)">😊 Happy</li>
+      <li onclick="playSingle(1)">🔥 Rocky Bhai</li>
+    </ul>
   </div>
 
   <script>
-    // Song list (tame aa path ma file muksho)
+    // Tamara "Music" folder na songs
     const songs = [
-      "songs/happy/happy1.mp3",
-      "songs/happy/happy2.mp3",
-      "songs/happy/happy3.mp3"
+      "Music/happy.mp3",
+      "Music/rocky bhai.mp3"
     ];
 
     let currentIndex = 0;
     const player = document.getElementById("player");
 
+    // Play all playlist
     function playSongs() {
       currentIndex = 0;
       player.src = songs[currentIndex];
       player.play();
     }
 
-    // Auto next song
+    // Play single song from list
+    function playSingle(index) {
+      currentIndex = index;
+      player.src = songs[currentIndex];
+      player.play();
+    }
+
+    // Auto next
     player.addEventListener("ended", () => {
       currentIndex++;
       if (currentIndex < songs.length) {

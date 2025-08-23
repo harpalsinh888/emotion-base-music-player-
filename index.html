@@ -5,20 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Emoji Music Player</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-    }
-    .emoji {
-      font-size: 50px;
-      cursor: pointer;
-      margin: 20px;
-      transition: transform 0.2s;
-    }
-    .emoji:hover {
-      transform: scale(1.2);
-    }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    .emoji { font-size: 50px; cursor: pointer; margin: 20px; transition: transform 0.2s; }
+    .emoji:hover { transform: scale(1.2); }
   </style>
 </head>
 <body>
@@ -28,38 +17,33 @@
   <div class="emoji" onclick="playSongs('happy')">😊</div>
 
   <script>
-    // Audio object
     let audio = new Audio();
-    let currentPlaylist = [];
-    let currentIndex = 0;
-
-    // Playlist define karo
-    const playlists = {
+    let playlist = {
       happy: [
         "happy/song1.mp3",
         "happy/song2.mp3",
         "happy/song3.mp3"
       ]
     };
+    let currentList = [];
+    let index = 0;
 
-    // Function to play songs in sequence
     function playSongs(mood) {
-      currentPlaylist = playlists[mood];
-      currentIndex = 0;
-      playCurrentSong();
+      currentList = playlist[mood];
+      index = 0;
+      playNext();
     }
 
-    // Helper: Play current song
-    function playCurrentSong() {
-      if (currentIndex < currentPlaylist.length) {
-        audio.src = currentPlaylist[currentIndex];
-        audio.play();
-        console.log("Playing:", currentPlaylist[currentIndex]);
-
-        // Jyaare song end thashe -> next song
-        audio.onended = function() {
-          currentIndex++;
-          playCurrentSong();
+    function playNext() {
+      if (index < currentList.length) {
+        audio.src = currentList[index];
+        audio.play()
+          .then(() => console.log("Playing:", currentList[index]))
+          .catch(err => console.error("Error:", err));
+        
+        audio.onended = () => {
+          index++;
+          playNext();
         };
       } else {
         console.log("Playlist finished");

@@ -3,59 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auto Music Player</title>
+  <title>Emoji Music Player</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 30px;
+      padding: 50px;
     }
-    button {
-      margin: 10px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      background: #4CAF50;
-      color: white;
-      font-size: 16px;
+    .emoji {
+      font-size: 50px;
       cursor: pointer;
-      transition: 0.3s;
+      margin: 20px;
+      transition: transform 0.2s;
     }
-    button:hover {
-      background: #45a049;
+    .emoji:hover {
+      transform: scale(1.2);
     }
   </style>
 </head>
 <body>
+  <h1>Click Emoji to Play Songs</h1>
 
-  <h1>🎵 Auto Music Player 🎵</h1>
-  <div id="buttons"></div>
-  <audio id="player" controls></audio>
+  <!-- Happy Mood Emoji -->
+  <div class="emoji" onclick="playSongs('happy')">😊</div>
 
   <script>
-    // 👇 Folder ma je pan mp3 files chhe eni list manually ahiya mukvi pade
-    // (Direct folder read karvu possible nathi HTML/JS ma)
-    const songs = [
-      "happy.mp3",
-      "sad.mp3",
-      "angry.mp3",
-      "newSong.mp3"
-    ];
+    // Audio object
+    let audio = new Audio();
+    let currentPlaylist = [];
+    let currentIndex = 0;
 
-    const buttonsDiv = document.getElementById("buttons");
-    const player = document.getElementById("player");
+    // Playlist define karo
+    const playlists = {
+      happy: [
+        "happy/song1.mp3",
+        "happy/song2.mp3",
+        "happy/song3.mp3"
+      ]
+    };
 
-    // Buttons generate karva
-    songs.forEach(song => {
-      const btn = document.createElement("button");
-      btn.textContent = song.replace(".mp3", ""); // filename maathi .mp3 hataavi
-      btn.onclick = () => {
-        player.src = song;
-        player.play();
-      };
-      buttonsDiv.appendChild(btn);
-    });
+    // Function to play songs in sequence
+    function playSongs(mood) {
+      currentPlaylist = playlists[mood];
+      currentIndex = 0;
+      playCurrentSong();
+    }
+
+    // Helper: Play current song
+    function playCurrentSong() {
+      if (currentIndex < currentPlaylist.length) {
+        audio.src = currentPlaylist[currentIndex];
+        audio.play();
+        console.log("Playing:", currentPlaylist[currentIndex]);
+
+        // Jyaare song end thashe -> next song
+        audio.onended = function() {
+          currentIndex++;
+          playCurrentSong();
+        };
+      } else {
+        console.log("Playlist finished");
+      }
+    }
   </script>
-
 </body>
 </html>

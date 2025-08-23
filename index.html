@@ -3,52 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emoji Music Player</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-    .emoji { font-size: 50px; cursor: pointer; margin: 20px; transition: transform 0.2s; }
-    .emoji:hover { transform: scale(1.2); }
-  </style>
+  <title>Emotion Songs</title>
 </head>
 <body>
-  <h1>Click Emoji to Play Songs</h1>
-
-  <!-- Happy Mood Emoji -->
-  <div class="emoji" onclick="playSongs('happy')">😊</div>
+  <h2>Happy Songs</h2>
+  <button onclick="playSongs()">▶ Play Happy Songs</button>
+  <audio id="player" controls></audio>
 
   <script>
-    let audio = new Audio();
-    let playlist = {
-      happy: [
-        "happy/song1.mp3",
-        "happy/song2.mp3",
-        "happy/song3.mp3"
-      ]
-    };
-    let currentList = [];
-    let index = 0;
+    // happy folder ma na badha songs ni list
+    const songs = [
+      "songs/happy/happy1.mp3",
+      "songs/happy/happy2.mp3",
+      "songs/happy/happy3.mp3"
+      // 👆 tame nava songs muksho to yaha list ma add karvanu nathi padtu
+      // auto detect karva ho to backend (PHP/Node) joiye
+    ];
 
-    function playSongs(mood) {
-      currentList = playlist[mood];
-      index = 0;
-      playNext();
+    let currentIndex = 0;
+    const player = document.getElementById("player");
+
+    function playSongs() {
+      currentIndex = 0;
+      player.src = songs[currentIndex];
+      player.play();
     }
 
-    function playNext() {
-      if (index < currentList.length) {
-        audio.src = currentList[index];
-        audio.play()
-          .then(() => console.log("Playing:", currentList[index]))
-          .catch(err => console.error("Error:", err));
-        
-        audio.onended = () => {
-          index++;
-          playNext();
-        };
-      } else {
-        console.log("Playlist finished");
+    // song puru thaya pachi next song play thase
+    player.addEventListener("ended", () => {
+      currentIndex++;
+      if (currentIndex < songs.length) {
+        player.src = songs[currentIndex];
+        player.play();
       }
-    }
+    });
   </script>
 </body>
 </html>

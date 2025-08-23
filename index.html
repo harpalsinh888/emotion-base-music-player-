@@ -3,21 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emotion Songs</title>
+  <title>Emotion Songs Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    .player-box {
+      background: rgba(0,0,0,0.4);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      text-align: center;
+      width: 300px;
+    }
+    button {
+      background: #ffcc00;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ffaa00;
+    }
+    audio {
+      margin-top: 15px;
+      width: 100%;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Happy Songs</h2>
-  <button onclick="playSongs()">▶ Play Happy Songs</button>
-  <audio id="player" controls></audio>
+  <h1>🎶 Emotion Songs Player 🎶</h1>
+  <div class="player-box">
+    <h2>Happy Songs</h2>
+    <button onclick="playSongs()">▶ Play Playlist</button>
+    <audio id="player" controls></audio>
+  </div>
 
   <script>
-    // happy folder ma na badha songs ni list
+    // Song list (tame aa path ma file muksho)
     const songs = [
       "songs/happy/happy1.mp3",
       "songs/happy/happy2.mp3",
       "songs/happy/happy3.mp3"
-      // 👆 tame nava songs muksho to yaha list ma add karvanu nathi padtu
-      // auto detect karva ho to backend (PHP/Node) joiye
     ];
 
     let currentIndex = 0;
@@ -29,7 +72,7 @@
       player.play();
     }
 
-    // song puru thaya pachi next song play thase
+    // Auto next song
     player.addEventListener("ended", () => {
       currentIndex++;
       if (currentIndex < songs.length) {

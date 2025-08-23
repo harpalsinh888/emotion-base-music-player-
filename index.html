@@ -9,44 +9,42 @@
       font-family: Arial, sans-serif;
       text-align: center;
       background: #f4f4f9;
-      padding: 40px;
-    }
-    h1 {
-      color: #333;
+      padding: 50px;
     }
     .emoji {
       font-size: 50px;
-      margin: 20px;
+      margin: 15px;
       cursor: pointer;
       transition: transform 0.2s;
     }
     .emoji:hover {
       transform: scale(1.3);
     }
+    audio {
+      margin-top: 30px;
+      width: 80%;
+    }
   </style>
 </head>
 <body>
-  <h1>🎵 Click Emoji to Play Song 🎵</h1>
-  
-  <!-- Emojis -->
-  <div>
-    <span class="emoji" onclick="playSong('happy')">😊</span>
-    <span class="emoji" onclick="playSong('sad')">😢</span>
-    <span class="emoji" onclick="playSong('angry')">😡</span>
-    <span class="emoji" onclick="playSong('love')">😍</span>
+  <h1>🎵 Emoji Music Player 🎵</h1>
+  <div id="emojis">
+    <span class="emoji" data-song="happy">😊</span>
   </div>
 
-  <!-- Audio -->
-  <audio id="audioPlayer" controls style="margin-top:20px; width:80%;"></audio>
+  <audio id="player" controls></audio>
 
   <script>
-    function playSong(mood) {
-      const audio = document.getElementById("audioPlayer");
-      audio.src = `music/${mood}.mp3`; // 👈 Path check karo
-      audio.play().catch(err => {
-        alert("Audio play error: " + err);
+    const audio = document.getElementById("player");
+    const emojis = document.querySelectorAll(".emoji");
+
+    emojis.forEach(e => {
+      e.addEventListener("click", () => {
+        const mood = e.getAttribute("data-song");
+        audio.src = `${mood}.mp3`;   // root folder maa direct file
+        audio.play();
       });
-    }
+    });
   </script>
 </body>
 </html>

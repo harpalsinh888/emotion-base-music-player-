@@ -3,48 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emoji Music Player</title>
+  <title>Auto Music Player</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: #f4f4f9;
-      padding: 50px;
+      padding: 30px;
     }
-    .emoji {
-      font-size: 50px;
-      margin: 15px;
+    button {
+      margin: 10px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #4CAF50;
+      color: white;
+      font-size: 16px;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: 0.3s;
     }
-    .emoji:hover {
-      transform: scale(1.3);
-    }
-    audio {
-      margin-top: 30px;
-      width: 80%;
+    button:hover {
+      background: #45a049;
     }
   </style>
 </head>
 <body>
-  <h1>🎵 Emoji Music Player 🎵</h1>
-  <div id="emojis">
-    <span class="emoji" data-song="happy">😊</span>
-  </div>
 
+  <h1>🎵 Auto Music Player 🎵</h1>
+  <div id="buttons"></div>
   <audio id="player" controls></audio>
 
   <script>
-    const audio = document.getElementById("player");
-    const emojis = document.querySelectorAll(".emoji");
+    // 👇 Folder ma je pan mp3 files chhe eni list manually ahiya mukvi pade
+    // (Direct folder read karvu possible nathi HTML/JS ma)
+    const songs = [
+      "happy.mp3",
+      "sad.mp3",
+      "angry.mp3",
+      "newSong.mp3"
+    ];
 
-    emojis.forEach(e => {
-      e.addEventListener("click", () => {
-        const mood = e.getAttribute("data-song");
-        audio.src = `${mood}.mp3`;   // root folder maa direct file
-        audio.play();
-      });
+    const buttonsDiv = document.getElementById("buttons");
+    const player = document.getElementById("player");
+
+    // Buttons generate karva
+    songs.forEach(song => {
+      const btn = document.createElement("button");
+      btn.textContent = song.replace(".mp3", ""); // filename maathi .mp3 hataavi
+      btn.onclick = () => {
+        player.src = song;
+        player.play();
+      };
+      buttonsDiv.appendChild(btn);
     });
   </script>
+
 </body>
 </html>

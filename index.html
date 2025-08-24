@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emotion Based Music Player 🎵</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      height: 100vh;
+      margin: 0;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .emoji-buttons button {
+      font-size: 2.5rem;
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    .emoji-buttons button:hover {
+      transform: scale(1.2);
+      background: rgba(255,255,255,0.2);
+    }
+
+    #songList {
+      margin-top: 20px;
+    }
+
+    .song-btn {
+      display: block;
+      margin: 8px auto;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .song-btn:hover {
+      background: rgba(255,255,255,0.4);
+    }
+
+    audio {
+      margin-top: 20px;
+      width: 80%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Emotion Based Music Player 🎶</h1>
+  <p>Click an emoji to select your mood</p>
+
+  <div class="emoji-buttons">
+    <button onclick="showSongs('happy')">😀</button>
+    <button onclick="showSongs('sad')">😢</button>
+    <button onclick="showSongs('angry')">😡</button>
+    <button onclick="showSongs('surprise')">😲</button>
+    <button onclick="showSongs('neutral')">😐</button>
+  </div>
+
+  <div id="songList"></div>
+
+  <audio id="player" controls></audio>
+
+  <script>
+    const songs = {
+      happy: [
+        { name: "Happy Song 1", file: "songs/happy1.mp3" },
+        { name: "Happy Song 2", file: "songs/happy2.mp3" }
+      ],
+      sad: [
+        { name: "Sad Song 1", file: "songs/sad1.mp3" },
+        { name: "Sad Song 2", file: "songs/sad2.mp3" }
+      ],
+      angry: [
+        { name: "Angry Song 1", file: "songs/angry1.mp3" }
+      ],
+      surprise: [
+        { name: "Surprise Song 1", file: "songs/surprise1.mp3" }
+      ],
+      neutral: [
+        { name: "Neutral Song 1", file: "songs/neutral1.mp3" }
+      ]
+    };
+
+    function showSongs(emotion) {
+      const songListDiv = document.getElementById("songList");
+      songListDiv.innerHTML = `<h2>${emotion.toUpperCase()} Songs</h2>`;
+
+      songs[emotion].forEach(song => {
+        const btn = document.createElement("button");
+        btn.className = "song-btn";
+        btn.innerText = song.name;
+        btn.onclick = () => playSong(song.file);
+        songListDiv.appendChild(btn);
+      });
+    }
+
+    function playSong(file) {
+      const player = document.getElementById("player");
+      player.src = file;
+      player.play();
+    }
+  </script>
+</body>
+</html>

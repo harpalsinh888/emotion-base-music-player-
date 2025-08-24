@@ -1,104 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emotion Based Music Player</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px;
-    }
-    .emoji-btn {
-      font-size: 50px;
-      cursor: pointer;
-      margin: 15px;
-    }
-    #songs {
-      margin-top: 30px;
-    }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+    <title>Spotify Login Demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {font-family: Arial, sans-serif; padding: 40px;}
+        .center {text-align: center;}
+        .btn {padding: 10px 20px; background: #1DB954; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer;}
+        .btn:hover {background: #158a36;}
+    </style>
 </head>
 <body>
-  <h1>Emotion Based Music Player 🎶</h1>
-
-  <button onclick="loginWithSpotify()">Login with Spotify</button>
-
-  <div id="emojis">
-    <span class="emoji-btn" onclick="loadSongs('happy')">😊</span>
-    <span class="emoji-btn" onclick="loadSongs('sad')">😢</span>
-    <span class="emoji-btn" onclick="loadSongs('angry')">😡</span>
-    <span class="emoji-btn" onclick="loadSongs('relax')">😌</span>
-  </div>
-
-  <div id="songs"></div>
-
-  <script>
-    const clientId = "c88196229d6a4f0ab80d7eea1eab1e6b"; // <-- Spotify client id
-    const redirectUri = "https://harpalsinh888.github.io/emotion-base-music-player-/callback"; // <-- Replace with GitHub Pages URL
-    const scopes = "user-read-playback-state user-modify-playback-state streaming";
-
-    function loginWithSpotify() {
-      const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
-      window.location.href = authUrl;
-    }
-
-    function getAccessToken() {
-      return localStorage.getItem("spotify_token");
-    }
-
-    async function loadSongs(mood) {
-      const token = getAccessToken();
-      if (!token) {
-        alert("Please login with Spotify first.");
-        return;
-      }
-
-      let query = "";
-      if (mood === "happy") query = "happy songs";
-      if (mood === "sad") query = "sad songs";
-      if (mood === "angry") query = "rock metal";
-      if (mood === "relax") query = "chill lofi";
-
-      const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
-        headers: { Authorization: "Bearer " + token }
-      });
-
-      const data = await res.json();
-      const container = document.getElementById("songs");
-      container.innerHTML = "<h2>Songs for mood: " + mood + "</h2>";
-
-      data.tracks.items.forEach(track => {
-        const btn = document.createElement("button");
-        btn.innerText = track.name + " - " + track.artists[0].name;
-        btn.onclick = () => {
-          playSong(track.uri);
-        };
-        container.appendChild(btn);
-      });
-    }
-
-    async function playSong(uri) {
-      const token = getAccessToken();
-      if (!token) {
-        alert("Please login first!");
-        return;
-      }
-
-      // This requires Spotify app open in background
-      await fetch("https://api.spotify.com/v1/me/player/play", {
-        method: "PUT",
-        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
-        body: JSON.stringify({ uris: [uri] })
-      });
-    }
-  </script>
+    <div class="center">
+        <h2>Spotify Login</h2>
+        <!-- Gujarati: Login button dabavo ane Spotify authentication page khulse -->
+        <button class="btn" onclick="loginWithSpotify()">Login with Spotify</button>
+    </div>
+    <script>
+        function loginWithSpotify() {
+            // Gujarati: Spotify authorize URL generate karo
+            const client_id = 'c88196229d6a4f0ab80d7eea1eab1e6b'; // Ahiya tamaru Spotify Client ID mukho
+            const redirect_uri = 'https://harpalsinh888.github.io/emotion-base-music-player-/callback'; // Callback page no URL
+            const scope = 'user-read-private user-read-email'; // Je permission joiye te
+            const auth_url = 
+                `https://accounts.spotify.com/authorize?client_id=${client_id}` +
+                `&redirect_uri=${encodeURIComponent(redirect_uri)}` +
+                `&response_type=token` +
+                `&scope=${encodeURIComponent(scope)}`;
+            window.location.href = auth_url;
+        }
+    </script>
 </body>
 </html>

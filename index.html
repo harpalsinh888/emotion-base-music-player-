@@ -14,15 +14,16 @@
 <body>
     <div class="center">
         <h2>Spotify Login</h2>
-        <!-- Gujarati: Login button dabavo ane Spotify authentication page khulse -->
+        <!-- Spotify login button dabavo -->
         <button class="btn" onclick="loginWithSpotify()">Login with Spotify</button>
     </div>
     <script>
         function loginWithSpotify() {
-            // Gujarati: Spotify authorize URL generate karo
-            const client_id = 'c88196229d6a4f0ab80d7eea1eab1e6b'; // Ahiya tamaru Spotify Client ID mukho
-            const redirect_uri = 'https://harpalsinh888.github.io/emotion-base-music-player-/callback'; // Callback page no URL
-            const scope = 'user-read-private user-read-email'; // Je permission joiye te
+            // Tamara Spotify nu actual Client ID mukho
+            const client_id = 'c88196229d6a4f0ab80d7eea1eab1e6b'; // <== Ahiya tamaru client_id mukho
+            const redirect_uri = 'https://harpalsinh888.github.io/emotion-base-music-player-/callback'; // Callback page nu URL
+            const scope = 'user-read-private user-read-email';
+            // Authorization URL
             const auth_url = 
                 `https://accounts.spotify.com/authorize?client_id=${client_id}` +
                 `&redirect_uri=${encodeURIComponent(redirect_uri)}` +

@@ -15,22 +15,21 @@
     <div id="result"></div>
 
     <script>
-        // Gujarati: URL mathi token parse karva nu function
+        // Gujarati: URL mathi token parse karo
         function getTokenFromUrl() {
-            // URL hash (#access_token=...) parse karo
             const hash = window.location.hash;
             const params = new URLSearchParams(hash.substring(1));
             return params.get('access_token');
         }
 
-        // Gujarati: Token male che ke nai check karo
+        // Token male che ke nai check karo
         const token = getTokenFromUrl();
         const resultDiv = document.getElementById('result');
 
         if (token) {
             // Gujarati: Token male to success message
             resultDiv.innerHTML = `<div class="token">Access Token: <b>${token}</b></div>`;
-            // Aa token tame localStorage ma store kari shako ya next API call mate use kari shako
+            // Example: localStorage ma store karvo hoy to (optional)
             // localStorage.setItem('spotify_token', token);
         } else {
             // Gujarati: Token na male to error message

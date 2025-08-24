@@ -2,87 +2,103 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Emotion Music Player 🎵</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emotion Based Music Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    .emoji-btn {
+      font-size: 50px;
+      cursor: pointer;
+      margin: 15px;
+    }
+    #songs {
+      margin-top: 30px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h2>Emotion Based Music Player 🎧</h2>
+  <h1>Emotion Based Music Player 🎶</h1>
 
-  <!-- Login -->
-  <button id="loginBtn">Login with Spotify</button>
-  <p id="status"></p>
+  <button onclick="loginWithSpotify()">Login with Spotify</button>
 
-  <!-- Emoji Buttons -->
-  <div>
-    <button class="emoji" data-playlist="37i9dQZF1DXdPec7aLTmlC">😄 Happy</button>
-    <button class="emoji" data-playlist="37i9dQZF1DWX83CujKHHOn">😢 Sad</button>
-    <button class="emoji" data-playlist="37i9dQZF1DX76Wlfdnj7AP">😡 Angry</button>
-    <button class="emoji" data-playlist="37i9dQZF1DX4WYpdgoIcn6">😌 Relax</button>
+  <div id="emojis">
+    <span class="emoji-btn" onclick="loadSongs('happy')">😊</span>
+    <span class="emoji-btn" onclick="loadSongs('sad')">😢</span>
+    <span class="emoji-btn" onclick="loadSongs('angry')">😡</span>
+    <span class="emoji-btn" onclick="loadSongs('relax')">😌</span>
   </div>
 
+  <div id="songs"></div>
+
   <script>
-    const clientId = "c4ae87d2c2124350875c8a4059c6d452"; // tamaru clientId
-    const redirectUri = "https://harpalsinh888.github.io/emotion-base-music-player-/callback"; // tamaru URI
+    const clientId = "YOUR_CLIENT_ID"; // <-- Spotify client id
+    const redirectUri = "http://localhost:5500/callback.html"; // <-- Replace with GitHub Pages URL
     const scopes = "user-read-playback-state user-modify-playback-state streaming";
 
-    // Spotify Login
-    document.getElementById("loginBtn").onclick = () => {
+    function loginWithSpotify() {
       const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
       window.location.href = authUrl;
-    };
-
-    // Token extract karo
-    const hash = window.location.hash.substring(1).split("&").reduce((initial, item) => {
-      if (item) {
-        let parts = item.split("=");
-        initial[parts[0]] = decodeURIComponent(parts[1]);
-      }
-      return initial;
-    }, {});
-
-    if (hash.access_token) {
-      localStorage.setItem("spotifyToken", hash.access_token);
-      document.getElementById("status").innerText = "✅ Logged in!";
-      window.location.hash = "";
     }
 
-    const token = localStorage.getItem("spotifyToken");
+    function getAccessToken() {
+      return localStorage.getItem("spotify_token");
+    }
 
-    // Playlist play karvanu
-    async function playPlaylist(playlistId) {
+    async function loadSongs(mood) {
+      const token = getAccessToken();
+      if (!token) {
+        alert("Please login with Spotify first.");
+        return;
+      }
+
+      let query = "";
+      if (mood === "happy") query = "happy songs";
+      if (mood === "sad") query = "sad songs";
+      if (mood === "angry") query = "rock metal";
+      if (mood === "relax") query = "chill lofi";
+
+      const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
+        headers: { Authorization: "Bearer " + token }
+      });
+
+      const data = await res.json();
+      const container = document.getElementById("songs");
+      container.innerHTML = "<h2>Songs for mood: " + mood + "</h2>";
+
+      data.tracks.items.forEach(track => {
+        const btn = document.createElement("button");
+        btn.innerText = track.name + " - " + track.artists[0].name;
+        btn.onclick = () => {
+          playSong(track.uri);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    async function playSong(uri) {
+      const token = getAccessToken();
       if (!token) {
         alert("Please login first!");
         return;
       }
 
-      const res = await fetch("https://api.spotify.com/v1/me/player/devices", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      const deviceId = data.devices[0]?.id;
-
-      if (!deviceId) {
-        alert("No active device found. Open Spotify app on your PC/Mobile.");
-        return;
-      }
-
-      await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+      // This requires Spotify app open in background
+      await fetch("https://api.spotify.com/v1/me/player/play", {
         method: "PUT",
-        body: JSON.stringify({ context_uri: `spotify:playlist:${playlistId}` }),
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify({ uris: [uri] })
       });
-
-      alert("🎶 Playing playlist...");
     }
-
-    document.querySelectorAll(".emoji").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const playlist = btn.getAttribute("data-playlist");
-        playPlaylist(playlist);
-      });
-    });
   </script>
 </body>
 </html>

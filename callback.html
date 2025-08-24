@@ -1,1 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spotify Callback</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {font-family: Arial, sans-serif; padding: 40px;}
+        .token {color: green;}
+        .error {color: red;}
+    </style>
+</head>
+<body>
+    <h2>Spotify Authentication Callback</h2>
+    <div id="result"></div>
+    <script>
+        // URL mathi token parse karo
+        function getTokenFromUrl() {
+            const hash = window.location.hash;
+            const params = new URLSearchParams(hash.substring(1));
+            return params.get('access_token');
+        }
 
+        // Token male chhe ke nai check karo
+        const token = getTokenFromUrl();
+        const resultDiv = document.getElementById('result');
+
+        if (token) {
+            resultDiv.innerHTML = `<div class="token">Access Token: <b>${token}</b></div>`;
+            // localStorage.setItem('spotify_token', token); // Token store karva hoy to
+        } else {
+            resultDiv.innerHTML = `<div class="error">Error: No token found.<br/>Spotify authentication fail thai chhe.</div>`;
+        }
+    </script>
+</body>
+</html>

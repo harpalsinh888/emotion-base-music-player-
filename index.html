@@ -1,108 +1,90 @@
-<!doctype html>
-<html lang="gu">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Instagram Downloader - સરળ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Downloader</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;background:#f7f9fc;color:#111;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
-    .card{background:#fff;padding:24px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.08);width:400px;max-width:92%}
-    h2{margin:0 0 12px;font-size:20px}
-    input{width:100%;padding:10px;border:1px solid #e3e7ee;border-radius:8px;font-size:14px}
-    button{margin-top:12px;width:100%;padding:10px;border:0;border-radius:8px;background:#0b74de;color:#fff;font-weight:600;cursor:pointer}
-    #result{margin-top:14px}
-    a.dl{display:inline-block;padding:8px 12px;border-radius:8px;background:#0b74de;color:#fff;text-decoration:none}
-    .note{font-size:12px;color:#555;margin-top:8px}
-    .small{font-size:13px;color:#444}
+    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
+    input { width: 80%; padding: 10px; font-size: 16px; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    #result { margin-top: 20px; }
+    a.download-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 15px;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Instagram Reels / Story Downloader</h2>
-    <div class="small">Post / Reel / Story no public link paste karo ane "Download" dabavo.</div>
-    <input id="instaLink" placeholder="Paste Instagram link here (ex: https://www.instagram.com/p/ABC... )">
-    <button id="btn">Download</button>
-    <div id="result"></div>
-    <div class="note">
-      <div>Important:</div>
-      <ul style="padding-left:18px;margin:6px 0">
-        <li>API key ne `<em>YOUR_RAPIDAPI_KEY</em>` thi replace karo (neeche steps chhe).</li>
-        <li>Keval public posts download thase — private account thi nahi.</li>
-      </ul>
-    </div>
-  </div>
+  <h2>🎬 YouTube Video / Audio Downloader</h2>
+  <input type="text" id="ytlink" placeholder="Paste YouTube video link here"><br>
+  <button onclick="downloadAudio()">Download Audio</button>
+  <button onclick="downloadVideo()">Download Video</button>
+
+  <div id="result"></div>
 
   <script>
-    // ====== CONFIG: Replace this with your RapidAPI key and host if needed ======
-    const RAPIDAPI_KEY = "98b29d2e42mshcf2392b1e28833bp121593jsn02928c685e53
-"; // <-- replace with your key
-    const RAPIDAPI_HOST = "instagram-downloader35.p.rapidapi.com"; // example host (change if you choose different API)
-    // ========================================================================
+    const API_KEY = "2f6a5aea35msh00a1fb740f1796dp1ff640jsn38401162b010";
+    const API_HOST = "youtube-video-fast-downloader-24-7.p.rapidapi.com";
 
-    async function download() {
-      const link = document.getElementById("instaLink").value.trim();
-      const resultEl = document.getElementById("result");
-      if (!link) {
-        alert("Kripya Instagram link paste karo.");
-        return;
-      }
+    async function downloadAudio() {
+      let url = document.getElementById("ytlink").value.trim();
+      if (!url) return alert("Please enter YouTube link!");
 
-      resultEl.innerHTML = "Processing...";
+      let videoId = extractVideoId(url);
+      const endpoint = `https://${API_HOST}/download_audio/${videoId}?quality=251`;
 
-      try {
-        // Example RapidAPI endpoint format — many RapidAPI Instagram downloader APIs follow similar pattern.
-        // If you choose a different RapidAPI listing, update the URL and fetch headers accordingly.
-        const apiUrl = `https://instagram-downloader35.p.rapidapi.com/rapid?url=${encodeURIComponent(link)}`;
-
-        const res = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'x-rapidapi-key': RAPIDAPI_KEY,
-            'x-rapidapi-host': RAPIDAPI_HOST
-          }
-        });
-
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(`API error: ${res.status} ${txt}`);
+      fetch(endpoint, {
+        method: "GET",
+        headers: {
+          "x-rapidapi-key": API_KEY,
+          "x-rapidapi-host": API_HOST
         }
-
-        const data = await res.json();
-        // Different APIs return different JSON structures.
-        // We try to handle a few common shapes:
-        resultEl.innerHTML = "";
-
-        // If API returns direct download url(s) in data.url or data.download_url or data.links[]
-        if (data.url) {
-          resultEl.innerHTML = `<p><a class="dl" href="${data.url}" target="_blank" download>Download File</a></p>`;
-        } else if (data.download_url) {
-          resultEl.innerHTML = `<p><a class="dl" href="${data.download_url}" target="_blank" download>Download File</a></p>`;
-        } else if (Array.isArray(data.links) && data.links.length) {
-          data.links.forEach((it, i) => {
-            const u = it.url || it.link || it;
-            resultEl.innerHTML += `<p><a class="dl" href="${u}" target="_blank" download>Download File ${i+1}</a></p>`;
-          });
-        } else if (data.media && data.media.length) {
-          // some apis return media array
-          data.media.forEach((m, i) => {
-            const u = m.url || m;
-            resultEl.innerHTML += `<p><a class="dl" href="${u}" target="_blank" download>Download Media ${i+1}</a></p>`;
-          });
-        } else {
-          resultEl.innerHTML = `<div style="color:#b33">Unable to parse response from API. Response preview below:</div><pre style="max-height:200px;overflow:auto;background:#fafafa;padding:8px;border-radius:8px">${JSON.stringify(data, null, 2)}</pre>`;
-        }
-
-      } catch (err) {
-        console.error(err);
-        document.getElementById("result").innerHTML = `<div style="color:#b33">Error: ${err.message}</div>`;
-      }
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        document.getElementById("result").innerHTML =
+          `<a class="download-btn" href="${data.link}" target="_blank">⬇ Download Audio</a>`;
+      })
+      .catch(err => console.error(err));
     }
 
-    document.getElementById("btn").addEventListener("click", download);
-    // allow Enter key
-    document.getElementById("instaLink").addEventListener("keydown", function(e){
-      if (e.key === "Enter") download();
-    });
+    async function downloadVideo() {
+      let url = document.getElementById("ytlink").value.trim();
+      if (!url) return alert("Please enter YouTube link!");
+
+      let videoId = extractVideoId(url);
+      const endpoint = `https://${API_HOST}/download_video/${videoId}?quality=360`;
+
+      fetch(endpoint, {
+        method: "GET",
+        headers: {
+          "x-rapidapi-key": API_KEY,
+          "x-rapidapi-host": API_HOST
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        document.getElementById("result").innerHTML =
+          `<a class="download-btn" href="${data.link}" target="_blank">⬇ Download Video</a>`;
+      })
+      .catch(err => console.error(err));
+    }
+
+    // Extract YouTube video ID from full link
+    function extractVideoId(url) {
+      let regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      let match = url.match(regExp);
+      return (match && match[7].length == 11) ? match[7] : null;
+    }
   </script>
 </body>
 </html>
+

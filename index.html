@@ -1,90 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YouTube Downloader</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
-    input { width: 80%; padding: 10px; font-size: 16px; }
-    button { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
-    #result { margin-top: 20px; }
-    a.download-btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 15px;
-      background: #28a745;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-    }
-  </style>
 </head>
 <body>
-  <h2>🎬 YouTube Video / Audio Downloader</h2>
-  <input type="text" id="ytlink" placeholder="Paste YouTube video link here"><br>
-  <button onclick="downloadAudio()">Download Audio</button>
-  <button onclick="downloadVideo()">Download Video</button>
-
+  <h2>YouTube Downloader</h2>
+  <input type="text" id="videoId" placeholder="Enter YouTube Video ID">
+  <button onclick="getDownload()">Get Links</button>
+  
   <div id="result"></div>
 
   <script>
-    const API_KEY = "2f6a5aea35msh00a1fb740f1796dp1ff640jsn38401162b010";
-    const API_HOST = "youtube-video-fast-downloader-24-7.p.rapidapi.com";
-
-    async function downloadAudio() {
-      let url = document.getElementById("ytlink").value.trim();
-      if (!url) return alert("Please enter YouTube link!");
-
-      let videoId = extractVideoId(url);
-      const endpoint = `https://${API_HOST}/download_audio/${videoId}?quality=251`;
-
-      fetch(endpoint, {
-        method: "GET",
-        headers: {
-          "x-rapidapi-key": API_KEY,
-          "x-rapidapi-host": API_HOST
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        document.getElementById("result").innerHTML =
-          `<a class="download-btn" href="${data.link}" target="_blank">⬇ Download Audio</a>`;
-      })
-      .catch(err => console.error(err));
-    }
-
-    async function downloadVideo() {
-      let url = document.getElementById("ytlink").value.trim();
-      if (!url) return alert("Please enter YouTube link!");
-
-      let videoId = extractVideoId(url);
-      const endpoint = `https://${API_HOST}/download_video/${videoId}?quality=360`;
-
-      fetch(endpoint, {
-        method: "GET",
-        headers: {
-          "x-rapidapi-key": API_KEY,
-          "x-rapidapi-host": API_HOST
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        document.getElementById("result").innerHTML =
-          `<a class="download-btn" href="${data.link}" target="_blank">⬇ Download Video</a>`;
-      })
-      .catch(err => console.error(err));
-    }
-
-    // Extract YouTube video ID from full link
-    function extractVideoId(url) {
-      let regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-      let match = url.match(regExp);
-      return (match && match[7].length == 11) ? match[7] : null;
+    async function getDownload() {
+      const videoId = document.getElementById("videoId").value;
+      const res = await fetch(`http://localhost:5000/download?id=${videoId}`);
+      const data = await res.json();
+      
+      let html = `<h3>${data.title}</h3>`;
+      html += `<a href="${data.video.videoUrl}" target="_blank">Download Video</a><br>`;
+      html += `<a href="${data.audio.audioUrl}" target="_blank">Download Audio</a>`;
+      document.getElementById("result").innerHTML = html;
     }
   </script>
 </body>
 </html>
-
